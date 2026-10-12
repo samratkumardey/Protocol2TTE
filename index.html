@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Protocol2TTE</title>
+  <meta name="description" content="Protocol2TTE: a clinician-supervised framework that connects LLM-assisted clinical-trial understanding with target trial emulation in real-world EHR data, evaluated on CREST-2.">
+  <meta name="keywords" content="Protocol2TTE, target trial emulation, large language models, clinical trial, CREST-2, real-world evidence, causal inference, EHR, human-in-the-loop, translational AI">
+  <meta property="og:title" content="Protocol2TTE: From Clinical Trial Knowledge to Real-World Causal Evidence">
+  <meta property="og:description" content="LLM-assisted trial knowledge extraction, clinical adjudication, and EHR-based target trial emulation of CREST-2.">
+  <meta property="og:image" content="static/images/fig1_framework.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="icon" href="static/images/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a class="brand" href="#top"><span class="brand-mark">P2T</span><span class="brand-text">Protocol2TTE</span></a>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a href="#abstract">Overview</a>
+      <a href="#framework">Framework</a>
+      <a href="#method">Method</a>
+      <a href="#benchmark">LLM Benchmark</a>
+      <a href="#emulation">Trial Emulation</a>
+      <a href="#concordance">CREST-2</a>
+      <a href="#supplementary">Supplementary</a>
+      <a href="#citation">Citation</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<header class="hero" id="top">
+  <div class="container hero-grid">
+    <div class="hero-main">
+      <p class="eyebrow">Translational AI · Clinical NLP · Causal Inference</p>
+      <h1 class="hero-title"><span class="hero-name">Protocol2TTE</span>From Clinical Trial Knowledge to Real-World Causal Evidence Using Large Language Models and Target Trial Emulation</h1>
+
+      <!-- EDIT: replace with author names / affiliations after review -->
+      <p class="authors">Anonymous Authors</p>
+      <p class="affil">Affiliations withheld for peer review &nbsp;·&nbsp; <span class="status-pill"><i class="fa-solid fa-hourglass-half"></i> Manuscript under review</span></p>
+
+      <p class="hero-summary">Accurate LLM extraction does not, by itself, make trial knowledge clinically valid, computable, or ready for causal analysis. Protocol2TTE adds what is missing: it turns a clinical trial into protocol knowledge objects, normalized concepts, and standardized codes; routes them through neurologist adjudication; and runs the result as an EHR target trial emulation of <strong>CREST-2</strong>.</p>
+
+      <div class="btn-row">
+        <!-- EDIT: point these to the paper / code once public -->
+        <a class="btn btn-primary is-disabled" href="#" aria-disabled="true" title="Available after publication"><i class="fa-solid fa-file-pdf"></i> Paper <small>(coming soon)</small></a>
+        <a class="btn" href="#supplementary"><i class="fa-solid fa-table"></i> Supplementary</a>
+        <a class="btn is-disabled" href="#" aria-disabled="true" title="Code release after publication"><i class="fa-brands fa-github"></i> Code <small>(coming soon)</small></a>
+        <a class="btn" href="#benchmark"><i class="fa-solid fa-ranking-star"></i> LLM Leaderboard</a>
+        <a class="btn" href="#citation"><i class="fa-solid fa-quote-right"></i> BibTeX</a>
+      </div>
+    </div>
+
+    <aside class="hero-card reveal">
+      <div class="hero-card-head">
+        <span class="hc-title">Four-year stroke or death</span>
+        <span class="hc-sub">ATO overlap-weighted risk, 0–1,460 days</span>
+      </div>
+      <div class="hc-contrast">
+        <div class="hc-label">CAS vs IMM <span class="hc-effect">RD −3.89 pp · RR 0.80</span></div>
+        <div class="bar-row"><span class="bar-lang treat">CAS</span><div class="bar-bg"><div class="bar-fill fill-treat" data-w="15.80"></div></div><span class="bar-val">15.80%</span></div>
+        <div class="bar-row"><span class="bar-lang imm">IMM</span><div class="bar-bg"><div class="bar-fill fill-imm" data-w="19.69"></div></div><span class="bar-val">19.69%</span></div>
+      </div>
+      <div class="hc-contrast">
+        <div class="hc-label">CEA vs IMM <span class="hc-effect">RD −5.40 pp · RR 0.73</span></div>
+        <div class="bar-row"><span class="bar-lang treat">CEA</span><div class="bar-bg"><div class="bar-fill fill-treat" data-w="14.47"></div></div><span class="bar-val">14.47%</span></div>
+        <div class="bar-row"><span class="bar-lang imm">IMM</span><div class="bar-bg"><div class="bar-fill fill-imm" data-w="19.87"></div></div><span class="bar-val">19.87%</span></div>
+      </div>
+      <p class="hc-foot"><i class="fa-solid fa-shield-halved"></i> Direction held in all 7 sensitivity specifications for both contrasts.</p>
+    </aside>
+  </div>
+
+  <div class="container">
+    <div class="metrics-row">
+      <div class="metric-card m1 reveal"><div class="metric-val"><span class="counter" data-to="14">0</span></div><div class="metric-lbl">open-weight LLMs screened</div><div class="metric-sub">12 technically eligible</div></div>
+      <div class="metric-card m2 reveal"><div class="metric-val"><span class="counter" data-to="23">0</span></div><div class="metric-lbl">validated model–context runs</div><div class="metric-sub">Full Context vs RAG</div></div>
+      <div class="metric-card m3 reveal"><div class="metric-val">~<span class="counter" data-to="115">0</span>M</div><div class="metric-lbl">patients in the EHR source</div><div class="metric-sub">149 U.S. health systems</div></div>
+      <div class="metric-card m4 reveal"><div class="metric-val"><span class="counter" data-to="5">0</span>/6</div><div class="metric-lbl">directional agreement with CREST-2</div><div class="metric-sub">83.3% of prespecified comparisons</div></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════ ABSTRACT ═══════════════ -->
+<section class="section" id="abstract">
+  <div class="container narrow">
+    <h2 class="section-title">Abstract</h2>
+    <div class="abstract">
+      <p>Translating clinical-trial knowledge into executable real-world evidence remains difficult and largely manual. Large language models (LLMs) can extract information from trial information, but accurate extraction does not ensure that the resulting knowledge is clinically valid, computable, or suitable for causal analysis. We developed <strong>Protocol2TTE</strong>, a clinician-supervised framework that connects LLM-assisted trial understanding with target-trial emulation using electronic health record (EHR) data. We benchmarked open-weight LLMs using Full Context and retrieval-augmented generation (RAG). Performance was evaluated separately for trial-design knowledge, clinical concepts, and standardized clinical codes. After neurologist-led adjudication, the resulting specification was used to emulate two CREST-2 comparisons: carotid artery stenting (CAS) versus intensive medical management (IMM) and carotid endarterectomy (CEA) versus IMM.</p>
+      <p>LLM performance varied substantially across models, context strategies, and representation layers, showing that extraction accuracy alone did not ensure computability. Both EHR emulations achieved prespecified covariate balance after overlap weighting. At four years, stroke-or-death risk was <strong>15.80%</strong> with CAS versus <strong>19.69%</strong> with IMM (risk difference [RD], −3.89 percentage points; risk ratio [RR], 0.80) and <strong>14.47%</strong> with CEA versus <strong>19.87%</strong> with IMM (RD, −5.40; RR, 0.73). Both primary effects remained directionally stable across seven sensitivity specifications. Five of six (83.3%) prespecified comparisons showed directional agreement with CREST-2 randomized outcomes. Protocol2TTE provides a traceable pathway from trial evidence through LLM-assisted extraction and clinical adjudication to computable real-world causal evidence. This pathway provides a foundation for scalable, human-supervised translational AI in comparative-effectiveness research and future clinical study design.</p>
+      <p class="index-terms"><strong>Index Terms</strong> — Causal inference, Clinical trial, Electronic health records, Human-in-the-loop, Large language models, Real-world evidence, Target trial emulation, Translational AI.</p>
+    </div>
+
+    <h3 class="sub-title">Research Questions</h3>
+    <div class="rq-grid">
+      <a class="rq-card rq1" href="#benchmark">
+        <span class="rq-tag">RQ1</span>
+        <p>How accurately and reliably can open-weight LLMs <strong>extract target-trial design knowledge</strong>, normalize clinically relevant concepts, and resolve standardized clinical codes?</p>
+        <span class="rq-go">See the LLM benchmark <i class="fa-solid fa-arrow-right"></i></span>
+      </a>
+      <a class="rq-card rq2" href="#emulation">
+        <span class="rq-tag">RQ2</span>
+        <p>Can a clinically adjudicated trial specification be translated into an <strong>auditable EHR-based target trial emulation</strong> that produces stable causal-effect estimates under prespecified diagnostic and sensitivity analyses?</p>
+        <span class="rq-go">See the trial emulation <i class="fa-solid fa-arrow-right"></i></span>
+      </a>
+    </div>
+
+    <h3 class="sub-title">Key Findings at a Glance</h3>
+    <ul class="findings">
+      <li><span class="fi-ico"><i class="fa-solid fa-layer-group"></i></span><div><strong>Extraction ≠ computability.</strong> Benchmark scores ranged from 0.073 to 0.573 (median 0.394) across 23 runs; no model led on PKO, concept, <em>and</em> code layers at once.</div></li>
+      <li><span class="fi-ico"><i class="fa-solid fa-scale-unbalanced"></i></span><div><strong>Full Context usually beats RAG, but not always.</strong> FC won in 8 of 11 paired models (72.7%); RAG lifted Llama 3.2 3B from 0.073 to 0.328.</div></li>
+      <li><span class="fi-ico"><i class="fa-solid fa-user-doctor"></i></span><div><strong>Clinician in the loop.</strong> The top configuration (DeepSeek-R1 14B, FC; score 0.573) was never executed directly. Only the neurologist-adjudicated specification reached the EHR.</div></li>
+      <li><span class="fi-ico"><i class="fa-solid fa-heart-pulse"></i></span><div><strong>Revascularization lowered four-year stroke or death</strong> in both emulations, with all post-weighting |SMD| &lt; 0.10, and the direction held across all sensitivity specifications.</div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ FRAMEWORK ═══════════════ -->
+<section class="section alt" id="framework">
+  <div class="container">
+    <h2 class="section-title">The Protocol2TTE Framework</h2>
+    <p class="lead">Four interacting layers carry a published trial from narrative text to computable, clinician-approved causal analysis. Each layer answers its own methodological question.</p>
+
+    <figure class="fig reveal">
+      <img class="zoomable" src="static/images/fig1_framework.jpg" alt="Integrated Protocol2TTE architecture with four layers: Public Knowledge Layer, TTE Specification Layer, Secure Data Layer, and Clinician-in-the-Loop layer." loading="lazy">
+      <figcaption><strong>Fig. 1.</strong> Integrated Protocol2TTE architecture for translating published clinical-trial knowledge into real-world target trial emulation. <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to zoom</span></figcaption>
+    </figure>
+
+    <div class="layer-grid">
+      <div class="layer-card l1 reveal">
+        <div class="layer-num">01</div>
+        <h4>Public Knowledge Layer</h4>
+        <p class="layer-q">Knowledge recovery: can the trial be turned into a structured representation without hidden protocol knowledge?</p>
+        <p>LLM extraction of the seven core target-trial components from the source trial.</p>
+      </div>
+      <div class="layer-card l2 reveal">
+        <div class="layer-num">02</div>
+        <h4>TTE Specification Layer</h4>
+        <p class="layer-q">Specification: does the recovered information answer the design questions needed to emulate the trial?</p>
+        <p>PKOs → normalized clinical concepts → standardized codes.</p>
+      </div>
+      <div class="layer-card l3 reveal">
+        <div class="layer-num">03</div>
+        <h4>Secure Data Layer</h4>
+        <p class="layer-q">Computation and identification: can the specification run on EHR data while preserving time zero, treatment definition, and confounding control?</p>
+        <p>Cohorts, propensity scores, ATO weighting, causal estimation, and comparison with the trial.</p>
+      </div>
+      <div class="layer-card l4 reveal">
+        <div class="layer-num">04</div>
+        <h4>Clinician in the Loop</h4>
+        <p class="layer-q">Oversight: no unreviewed model output is treated as executable clinical logic.</p>
+        <p>Review of concepts and codes, cohort logic, balance and positivity, and final interpretations.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-title center">Seven Core Target-Trial Components</h3>
+    <div class="component-row">
+      <div class="comp"><i class="fa-solid fa-users"></i><span>Eligibility criteria</span></div>
+      <div class="comp"><i class="fa-solid fa-capsules"></i><span>Treatment strategies</span></div>
+      <div class="comp"><i class="fa-solid fa-shuffle"></i><span>Assignment procedures</span></div>
+      <div class="comp"><i class="fa-regular fa-clock"></i><span>Time zero</span></div>
+      <div class="comp"><i class="fa-solid fa-magnifying-glass-chart"></i><span>Outcomes</span></div>
+      <div class="comp"><i class="fa-regular fa-calendar-check"></i><span>Follow-up</span></div>
+      <div class="comp"><i class="fa-solid fa-diagram-project"></i><span>Causal estimands</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ METHOD ═══════════════ -->
+<section class="section" id="method">
+  <div class="container">
+    <h2 class="section-title">Method: From Trial Text to Causal Estimate</h2>
+    <p class="lead">Two linked stages. <strong>Stage 1</strong> benchmarks open-weight LLMs on recovering trial knowledge. <strong>Stage 2</strong> runs the clinically adjudicated specification as two contrast-specific EHR target trials.</p>
+
+    <div class="stage-banner s1"><span class="stage-pill">Stage 1</span> LLM extraction, normalization &amp; constrained code resolution</div>
+
+    <h3 class="sub-title">A hierarchical trial-knowledge representation</h3>
+    <div class="funnel reveal">
+      <div class="funnel-step f1">
+        <div class="fs-val">23</div>
+        <div class="fs-lbl">Protocol Knowledge Objects</div>
+        <p>The smallest independently scorable design statements, each assigned to one of the seven components. Retained after expert adjudication.</p>
+      </div>
+      <div class="funnel-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      <div class="funnel-step f2">
+        <div class="fs-val">17</div>
+        <div class="fs-lbl">Normalized clinical concepts</div>
+        <p>10 initially code-resolution applicable plus 7 design concepts that need no standardized code.</p>
+      </div>
+      <div class="funnel-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      <div class="funnel-step f3">
+        <div class="fs-val">9</div>
+        <div class="fs-lbl">Unique codeable concepts</div>
+        <p>Resolved by <em>constrained selection</em> from OHDSI/Athena candidate packages, or <code>NO_SUITABLE_CANDIDATE</code>.</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <h3 class="sub-title">Two evidence-access strategies</h3>
+        <p>Each eligible model was run under <span class="tag tag-fc">Full Context (FC)</span> and <span class="tag tag-rag">RAG</span>. Both conditions used the <em>same</em> role, instruction, schema, and grounding constraints. Only the supplied evidence differed:</p>
+        <div class="eq">$$P_{t,r} = R \oplus I_t \oplus E_r(D,t) \oplus S_t \oplus G$$</div>
+        <div class="eq">$$E_{\mathrm{FC}}(D,t)=D, \qquad E_{\mathrm{RAG}}(D,t)=\operatorname{TopK}_{c_j \subset D}\; \mathrm{sim}\big(E(q_t),E(c_j)\big)$$</div>
+        <p class="small">RAG chunks were embedded with <code>nomic-embed-text</code> and ranked by cosine similarity. Retrieval logs keep the chunk ID, rank, similarity score, embedding model, and source hash.</p>
+
+        <h3 class="sub-title">Nine schema-guided extraction tasks</h3>
+        <div class="chip-row">
+          <span class="chip">ELIG_CORE</span><span class="chip">ELIG_EXCL</span><span class="chip">TREAT_ARMS</span><span class="chip">TREAT_COMPONENTS</span><span class="chip">ASSIGNMENT</span><span class="chip">TIME_ZERO</span><span class="chip">FOLLOWUP</span><span class="chip">OUTCOMES</span><span class="chip">ANALYSIS</span>
+        </div>
+      </div>
+      <div>
+        <h3 class="sub-title">The Protocol2TTE Benchmark Score</h3>
+        <div class="eq">$$\mathrm{Score} = 0.50\,F1_{\mathrm{PKO}} + 0.30\,F1_{\mathrm{Concept}} + 0.20\,F1_{\mathrm{Code}}$$</div>
+        <div class="weight-bar" aria-label="Benchmark weights">
+          <span class="wb wb-pko" style="flex:50">PKO 0.50</span><span class="wb wb-con" style="flex:30">Concept 0.30</span><span class="wb wb-code" style="flex:20">Code 0.20</span>
+        </div>
+        <p class="small">PKO gets the largest weight because errors in eligibility, treatment, time zero, follow-up, or outcomes propagate to every downstream stage. Relaxed F1 is the primary metric. Code matching is one-to-one, so duplicate selections cannot inflate recall. The score is a <em>comparative index</em>, not a percent accuracy.</p>
+
+        <h3 class="sub-title">Human-in-the-loop adjudication</h3>
+        <p>A neurologist reviewed candidate PKOs for source support, clinical validity, component assignment, attribute correctness, and EHR computability. The reference standard was <strong>frozen before model evaluation</strong>.</p>
+        <div class="chip-row hitl"><span class="chip">approve</span><span class="chip">modify</span><span class="chip">split</span><span class="chip">merge</span><span class="chip">exclude</span><span class="chip">add</span></div>
+      </div>
+    </div>
+
+    <h3 class="sub-title">TABLE I — Translating the CREST-2 target trial to a pragmatic EHR implementation</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Target-trial component</th><th>Trial representation</th><th>Pragmatic EHR implementation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Eligibility</strong></td><td>High-grade asymptomatic carotid stenosis and trial exclusions</td><td>Structured diagnoses, procedures, imaging proxies, demographics, and temporal phenotypes</td></tr>
+          <tr><td><strong>Treatment strategies</strong></td><td>CAS+IMM vs IMM; CEA+IMM vs IMM</td><td>Separate CAS-vs-IMM and CEA-vs-IMM emulations</td></tr>
+          <tr><td><strong>Treatment assignment</strong></td><td>Randomized assignment</td><td>Observed treatment assignment with measured baseline confounding adjustment</td></tr>
+          <tr><td><strong>Time zero</strong></td><td>Randomization</td><td>Contrast-specific index date aligned with eligibility and treatment assignment</td></tr>
+          <tr><td><strong>Outcomes</strong></td><td>Stroke/death and cerebrovascular outcomes</td><td>Prespecified computable structured-EHR outcome phenotypes</td></tr>
+          <tr><td><strong>Follow-up</strong></td><td>Early and longitudinal follow-up</td><td>Prespecified early and cumulative windows through 1,460 days</td></tr>
+          <tr><td><strong>Causal contrast / analysis</strong></td><td>Randomized treatment contrasts</td><td>ATO overlap-weighted causal contrasts as the primary analysis</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">Full PKO → concept → code traceability is in <a href="#supplementary" data-open-supp="S1">Supplementary Table S1</a>.</p>
+
+    <div class="stage-banner s2"><span class="stage-pill">Stage 2</span> EHR target trial emulation &amp; causal estimation</div>
+
+    <div class="settings-grid">
+      <div class="setting"><div class="set-k"><i class="fa-solid fa-database"></i> Data source</div><div class="set-v">Oracle Health Real-World Data (Feb 2025 release): 149 U.S. health systems, ~115 M patients, ~2 B encounters, all four Census regions.</div></div>
+      <div class="setting"><div class="set-k"><i class="fa-solid fa-code-branch"></i> Emulated trials</div><div class="set-v">Two separate binary trials, CAS vs IMM and CEA vs IMM, each with its own IMM comparator. Neither is read as a CAS-vs-CEA comparison.</div></div>
+      <div class="setting"><div class="set-k"><i class="fa-solid fa-bullseye"></i> Primary estimand</div><div class="set-v">Average treatment effect in the overlap population (ATO), using propensity-score overlap weights.</div></div>
+      <div class="setting"><div class="set-k"><i class="fa-solid fa-scale-balanced"></i> Diagnostics</div><div class="set-v">Weighted |SMD| &lt; 0.10 prespecified; treatment-specific effective sample size (ESS); empirical overlap.</div></div>
+      <div class="setting"><div class="set-k"><i class="fa-solid fa-notes-medical"></i> Endpoints (8)</div><div class="set-v">Stroke or death, any stroke, any / anterior / posterior / unspecified ischemic stroke, ICH, death.</div></div>
+      <div class="setting"><div class="set-k"><i class="fa-regular fa-calendar"></i> Windows</div><div class="set-v">0–44, 0–90, 0–180, 0–365, 0–730, 0–1095, and 0–1460 days, plus a 45–1460-day landmark.</div></div>
+      <div class="setting"><div class="set-k"><i class="fa-solid fa-chart-line"></i> Effects</div><div class="set-v">Weighted cumulative risk, RD, and RR (primary); weighted Cox HR (complementary).</div></div>
+      <div class="setting"><div class="set-k"><i class="fa-solid fa-sliders"></i> Robustness</div><div class="set-v">7 sensitivity scenarios × 2 contrasts × 8 endpoints = 112 four-year estimates, plus exploratory HTE.</div></div>
+    </div>
+
+    <div class="eq-grid">
+      <div class="eq-card"><div class="eq-lbl">Propensity score</div>$$e_{ic}=P(A_{ic}=1\mid X_i)=\operatorname{expit}(\beta_{0c}+\beta_c^{\top}X_i)$$</div>
+      <div class="eq-card"><div class="eq-lbl">Overlap (ATO) weight</div>$$w^{OW}_{ic}=A_{ic}(1-\hat e_{ic})+(1-A_{ic})\,\hat e_{ic}$$</div>
+      <div class="eq-card"><div class="eq-lbl">Effective sample size</div>$$ESS_a=\frac{\big(\sum_{i:A_i=a} w_i\big)^2}{\sum_{i:A_i=a} w_i^2}$$</div>
+      <div class="eq-card"><div class="eq-lbl">Weighted risk, RD &amp; RR</div>$$\hat R_{cka}(t)=\frac{\sum_{i:A_{ic}=a} w^{OW}_{ic}Y_{ik}(t)}{\sum_{i:A_{ic}=a} w^{OW}_{ic}}$$ $$\widehat{RD}_{ck}(t)=\hat R_{ck1}(t)-\hat R_{ck0}(t),\qquad \widehat{RR}_{ck}(t)=\frac{\hat R_{ck1}(t)}{\hat R_{ck0}(t)}$$</div>
+    </div>
+
+    <details class="algo">
+      <summary><i class="fa-solid fa-code"></i> Algorithm 1 — End-to-end Protocol2TTE extraction, implementation, and causal estimation <span class="algo-toggle">show</span></summary>
+      <div class="algo-body">
+        <p class="algo-io"><strong>Input:</strong> \(D, E, \mathcal{M}=\{M_1,\dots,M_J\}, \mathcal{Q}=\{\mathrm{FC},\mathrm{RAG}\}, \mathcal{G}=\{\mathcal{G}_P,\mathcal{G}_C,\mathcal{G}_Z\}\), standardized vocabulary \(\mathcal{V}\)<br>
+        <strong>Output:</strong> \(\mathcal{H}^*\), emulated cohorts \(\mathcal{E}^*\), treatment-effect estimates \(\hat\Theta\), robustness results \(\hat{\mathcal{S}}\), trial-concordance assessment \(\Psi\)</p>
+        <ol class="algo-lines">
+          <li>\(D^* \leftarrow \mathrm{FreezeSource}(D)\)</li>
+          <li>\(\mathcal{M}^* \leftarrow \{M_j\in\mathcal{M} : \mathrm{TechnicalScreen}(M_j)=1\}\)</li>
+          <li><b>for each</b> \(M_j\in\mathcal{M}^*\) <b>do</b></li>
+          <li class="i1"><b>for each</b> \(q\in\mathcal{Q}\) <b>do</b></li>
+          <li class="i2">\(D_q \leftarrow D^*\) if \(q=\mathrm{FC}\)</li>
+          <li class="i2">\(D_q \leftarrow \mathrm{Retrieve}(D^*, e_k, K)\) if \(q=\mathrm{RAG}\)</li>
+          <li class="i2">\(\hat P_{j,q} \leftarrow \bigcup_{k=1}^{7}\mathrm{ExtractPKO}_k(M_j, D_q)\)</li>
+          <li class="i2">\(\hat P_{j,q} \leftarrow \mathrm{Consolidate}(\hat P_{j,q})\)</li>
+          <li class="i2">\(\hat C_{j,q} \leftarrow \mathrm{ExtractConcepts}(\hat P_{j,q})\)</li>
+          <li class="i2">\(\mathcal{A}_{j,q} \leftarrow \mathrm{CandidateMap}(\hat C_{j,q}, \mathcal{V})\)</li>
+          <li class="i2">\(\hat Z_{j,q} \leftarrow \mathrm{SelectCodes}(M_j, \mathcal{A}_{j,q})\)</li>
+          <li class="i2">\(F^{P}_{j,q} \leftarrow \mathrm{ScorePKO}(\hat P_{j,q}, \mathcal{G}_P)\)</li>
+          <li class="i2">\(F^{C}_{j,q} \leftarrow \mathrm{ScoreConcept}(\hat C_{j,q}, \mathcal{G}_C)\)</li>
+          <li class="i2">\(F^{Z}_{j,q} \leftarrow \mathrm{ScoreCode}(\hat Z_{j,q}, \mathcal{G}_Z)\)</li>
+          <li class="i2">\(B_{j,q} \leftarrow \omega_P F^{P}_{j,q} + \omega_C F^{C}_{j,q} + \omega_Z F^{Z}_{j,q}\)</li>
+          <li class="i1"><b>end for</b></li>
+          <li><b>end for</b></li>
+          <li>\((M^*, q^*) \leftarrow \arg\max_{M_j, q} B_{j,q}\)</li>
+          <li>\(\mathcal{H}_M \leftarrow \{\hat P_{M^*,q^*}, \hat C_{M^*,q^*}, \hat Z_{M^*,q^*}\}\)</li>
+          <li>\(\mathcal{H}^* \leftarrow \mathrm{HITL}(\mathcal{H}_M)\)</li>
+          <li>\(\mathcal{E}^* \leftarrow \mathrm{Emulate}(E, \mathcal{H}^*)\)</li>
+          <li>\(\mathcal{E}^* \leftarrow \mathrm{Align}(\mathrm{Eligibility}, A, T_0, \mathrm{FollowUp}, Y, X)\)</li>
+          <li>\(e(X_i) \leftarrow \Pr(A_i=1\mid X_i)\)</li>
+          <li>\(w_i^{ATO} \leftarrow A_i[1-e(X_i)] + (1-A_i)\,e(X_i)\)</li>
+          <li>\(\Omega \leftarrow \mathrm{Audit}(\mathcal{E}^*, e(X), w^{ATO})\) <span class="cmt">▹ overlap, balance, ESS</span></li>
+          <li>\(\hat\Theta \leftarrow \mathrm{Estimate}(\mathcal{E}^*, w^{ATO})\) <span class="cmt">▹ risk, RD, RR, Cox</span></li>
+          <li>\(\hat{\mathcal{S}} \leftarrow \mathrm{Sensitivity}(\hat\Theta, \mathcal{S}) \cup \mathrm{HTE}(\hat\Theta, \mathcal{G}_{HTE})\)</li>
+          <li>\(\Psi \leftarrow \mathrm{Concordance}(\hat\Theta, \Theta_{RCT})\)</li>
+          <li><b>return</b> \(\mathcal{H}^*, \mathcal{E}^*, \hat\Theta, \hat{\mathcal{S}}, \Psi\)</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ═══════════════ RQ1 BENCHMARK ═══════════════ -->
+<section class="section alt" id="benchmark">
+  <div class="container">
+    <h2 class="section-title"><span class="rq-inline rq1">RQ1</span> LLM Benchmark: Extraction Is Not Computability</h2>
+    <p class="lead">Fourteen locally deployable open-weight LLMs were screened. Meditron 7B and BioMistral failed technical eligibility (structured JSON, schema compliance, trial-scale input). The other twelve produced <strong>23 validated runs</strong>, 11 of them with paired FC and RAG results.</p>
+
+    <div class="stat-strip">
+      <div class="ss"><span class="ss-v">0.573</span><span class="ss-l">best score<br>DeepSeek-R1 14B · FC</span></div>
+      <div class="ss"><span class="ss-v">0.394</span><span class="ss-l">median score<br>IQR 0.324–0.447</span></div>
+      <div class="ss"><span class="ss-v">0.073</span><span class="ss-l">lowest score<br>Llama 3.2 3B · FC</span></div>
+      <div class="ss"><span class="ss-v">8/11</span><span class="ss-l">paired models<br>where FC &gt; RAG</span></div>
+    </div>
+
+    <h3 class="sub-title">TABLE II — Protocol2TTE performance across LLMs and context strategies</h3>
+    <div class="table-toolbar">
+      <div class="seg" id="lbMode" role="tablist" aria-label="Context strategy">
+        <button class="seg-btn active" data-mode="both">FC + RAG</button>
+        <button class="seg-btn" data-mode="FC">Full Context</button>
+        <button class="seg-btn" data-mode="RAG">RAG</button>
+      </div>
+      <span class="hint"><i class="fa-solid fa-arrow-down-wide-short"></i> Click a column header to sort</span>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table leaderboard sortable" id="leaderboard"></table>
+    </div>
+    <p class="table-note">PKO and Concept are relaxed F1. Code is code-level F1. Final is the Protocol2TTE benchmark score. “Best” is each model's stronger configuration. Phi-4 14B has a validated RAG run only. Full per-run metrics (51 fields, 5 panels) are in <a href="#supplementary" data-open-supp="S3">Supplementary Table S3</a>.</p>
+
+    <div class="two-col align-start">
+      <figure class="fig reveal">
+        <img class="zoomable" src="static/images/fig2_benchmark_radar.jpg" alt="Radar chart of Final score, PKO relaxed F1, Concept relaxed F1 and Code F1 for the six leading configurations." loading="lazy">
+        <figcaption><strong>Fig. 2.</strong> Multidimensional benchmark profiles of the leading configurations across LLMs and context strategies. <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to zoom</span></figcaption>
+      </figure>
+
+      <div class="explorer reveal">
+        <div class="explorer-head">
+          <h4><i class="fa-solid fa-microscope"></i> Model Explorer</h4>
+          <select id="modelSelect" aria-label="Choose a model"></select>
+        </div>
+        <div id="explorerBody"></div>
+        <div class="legend-inline"><span class="lg lg-fc"></span>Full Context <span class="lg lg-rag"></span>RAG</div>
+      </div>
+    </div>
+
+    <h3 class="sub-title">Full Context vs RAG: the context effect depends on the model</h3>
+    <div class="two-col align-start">
+      <div class="chart-card reveal">
+        <div id="dumbbell" class="dumbbell" role="img" aria-label="Dumbbell chart of FC and RAG benchmark scores for 11 paired models"></div>
+        <div class="legend-inline"><span class="lg lg-fc"></span>Full Context <span class="lg lg-rag"></span>RAG <span class="muted">· sorted by FC − RAG; Δ from rounded scores</span></div>
+      </div>
+      <div class="callouts">
+        <div class="callout c-blue"><div class="co-k">FC wins</div><div class="co-v">8 / 11 <small>(72.7%)</small></div><p>Median FC 0.438 (IQR 0.350–0.499) vs RAG 0.378 (IQR 0.326–0.407). Median paired difference +0.066.</p></div>
+        <div class="callout c-amber"><div class="co-k">Largest RAG gain</div><div class="co-v">+0.255</div><p>Llama 3.2 3B rose from 0.073 (FC) to 0.328 (RAG). MedGemma 27B barely moved (0.488 vs 0.479).</p></div>
+        <div class="callout c-green"><div class="co-k">No universal winner</div><div class="co-v">Scale ≠ skill</div><p>Performance was not ordered by model size or biomedical specialization. Llama 3.1 8B had the best PKO F1 (0.600); DeepSeek-R1 led on concept (0.545) and code (0.706).</p></div>
+      </div>
+    </div>
+
+    <div class="selected-box reveal">
+      <div class="sel-ico"><i class="fa-solid fa-circle-check"></i></div>
+      <div>
+        <h4>Selected Stage-1 configuration → clinical review → EHR</h4>
+        <p><strong>DeepSeek-R1 14B with Full Context</strong> ranked first on the prespecified composite (0.573; PKO 0.536, Concept 0.545, Code 0.706). It was chosen on the overall ranking, not on any single layer. Its output went to the post-benchmark human-in-the-loop checkpoint, and <em>only the clinically reviewed specification</em> was used for phenotype operationalization.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ RQ2 EMULATION ═══════════════ -->
+<section class="section" id="emulation">
+  <div class="container">
+    <h2 class="section-title"><span class="rq-inline rq2">RQ2</span> Target Trial Emulation in Real-World EHR Data</h2>
+    <p class="lead">The adjudicated specification was run as two contrast-specific target trials. Each IMM comparator was built separately, because eligibility, treatment opportunity, and empirical support differ between CAS and CEA.</p>
+
+    <div class="cohort-grid">
+      <div class="cohort-card reveal">
+        <div class="cohort-head"><span class="ch-title">CAS vs IMM</span><span class="ch-n"><span class="counter" data-to="25640" data-sep="1">0</span> patients</span></div>
+        <div class="split-bar"><span class="sb-treat" style="flex:7416">CAS 7,416</span><span class="sb-imm" style="flex:18224">IMM 18,224</span></div>
+        <div class="cohort-ess"><span>Initial ESS after ATO weighting</span><strong>CAS 5,019 · IMM 8,762</strong></div>
+      </div>
+      <div class="cohort-card reveal">
+        <div class="cohort-head"><span class="ch-title">CEA vs IMM</span><span class="ch-n"><span class="counter" data-to="67813" data-sep="1">0</span> patients</span></div>
+        <div class="split-bar"><span class="sb-treat" style="flex:50101">CEA 50,101</span><span class="sb-imm" style="flex:17712">IMM 17,712</span></div>
+        <div class="cohort-ess"><span>Initial ESS after ATO weighting</span><strong>CEA 16,807 · IMM 12,628</strong></div>
+      </div>
+    </div>
+
+    <h3 class="sub-title">Overlap &amp; balance</h3>
+    <div class="tabs" data-tabs>
+      <div class="tab-btns"><button class="tab-btn active" data-tab="0">(A) CAS vs IMM</button><button class="tab-btn" data-tab="1">(B) CEA vs IMM</button></div>
+      <figure class="fig tab-pane active"><img class="zoomable" src="static/images/fig3a_ps_overlap_cas.jpg" alt="Propensity-score overlap before and after ATO weighting, CAS versus IMM" loading="lazy"></figure>
+      <figure class="fig tab-pane"><img class="zoomable" src="static/images/fig3b_ps_overlap_cea.jpg" alt="Propensity-score overlap before and after ATO weighting, CEA versus IMM" loading="lazy"></figure>
+      <p class="figcap"><strong>Fig. 3.</strong> Propensity-score overlap before weighting and after ATO weighting. After overlap weighting, <strong>no evaluated baseline covariate exceeded |SMD| = 0.10</strong> in either emulation (<a href="#supp-figures">Supplementary Fig. S1</a>, <a href="#supplementary" data-open-supp="S5A">Table S5A</a>; interval-specific ESS in <a href="#supplementary" data-open-supp="S5B">Table S5B</a>).</p>
+    </div>
+
+    <h3 class="sub-title">Primary causal effects: four-year stroke or death</h3>
+    <div class="effect-grid">
+      <div class="effect-card reveal">
+        <div class="ef-title">CAS vs IMM</div>
+        <div class="ef-risks"><div><span class="ef-v treat">15.80%</span><span class="ef-l">CAS</span></div><div class="ef-vs">vs</div><div><span class="ef-v imm">19.69%</span><span class="ef-l">IMM</span></div></div>
+        <div class="ef-stats"><span><b>RD</b> −3.89 pp</span><span><b>RR</b> 0.80</span><span><b>HR</b> 0.82 (0.75–0.89)</span></div>
+      </div>
+      <div class="effect-card reveal">
+        <div class="ef-title">CEA vs IMM</div>
+        <div class="ef-risks"><div><span class="ef-v treat">14.47%</span><span class="ef-l">CEA</span></div><div class="ef-vs">vs</div><div><span class="ef-v imm">19.87%</span><span class="ef-l">IMM</span></div></div>
+        <div class="ef-stats"><span><b>RD</b> −5.40 pp</span><span><b>RR</b> 0.73</span><span><b>HR</b> 0.72 (0.68–0.77)</span></div>
+      </div>
+    </div>
+    <div class="tabs" data-tabs>
+      <div class="tab-btns"><button class="tab-btn active" data-tab="0">(A) CAS vs IMM</button><button class="tab-btn" data-tab="1">(B) CEA vs IMM</button></div>
+      <figure class="fig tab-pane active"><img class="zoomable" src="static/images/fig4a_risk_cas.jpg" alt="ATO-weighted cumulative stroke-or-death risk curves, CAS versus IMM, through 1,460 days" loading="lazy"></figure>
+      <figure class="fig tab-pane"><img class="zoomable" src="static/images/fig4b_risk_cea.jpg" alt="ATO-weighted cumulative stroke-or-death risk curves, CEA versus IMM, through 1,460 days" loading="lazy"></figure>
+      <p class="figcap"><strong>Fig. 4.</strong> Primary ATO-weighted cumulative stroke-or-death risk: longitudinal absolute-risk trajectories with the four-year risks, RD, and RR. Detailed weighted estimates are in <a href="#supplementary" data-open-supp="S6">Supplementary Table S6</a>.</p>
+    </div>
+
+    <h3 class="sub-title">Weighted time-to-event effects</h3>
+    <div class="two-col align-start">
+      <div class="chart-card reveal">
+        <div class="forest-head"><span>Weighted Cox HR (95% CI), all 8 endpoints</span><div class="seg small" id="forestWin"><button class="seg-btn active" data-win="0">0–1460 d</button><button class="seg-btn" data-win="1">0–44 d</button><button class="seg-btn" data-win="2">45–1460 d</button></div></div>
+        <div id="forest" class="forest" role="img" aria-label="Forest plot of weighted Cox hazard ratios"></div>
+        <div class="legend-inline"><span class="lg lg-treat"></span>CAS vs IMM <span class="lg lg-cea"></span>CEA vs IMM <span class="muted">· HR &lt; 1 favors revascularization · source: Table S7</span></div>
+      </div>
+      <div class="tabs" data-tabs>
+        <div class="tab-btns"><button class="tab-btn active" data-tab="0">(A) CAS vs IMM</button><button class="tab-btn" data-tab="1">(B) CEA vs IMM</button></div>
+        <figure class="fig tab-pane active"><img class="zoomable" src="static/images/fig5a_cox_cas.jpg" alt="Hazard ratios for prespecified endpoints, CAS versus IMM" loading="lazy"></figure>
+        <figure class="fig tab-pane"><img class="zoomable" src="static/images/fig5b_cox_cea.jpg" alt="Hazard ratios for prespecified endpoints, CEA versus IMM" loading="lazy"></figure>
+        <p class="figcap"><strong>Fig. 5.</strong> Hazard ratios and 95% CIs for the prespecified endpoints over 0–1460 and 45–1460 days. For CAS, anterior ischemic stroke was higher over 0–1460 days (HR 1.44) but not over 45–1460 days. Posterior ischemic-stroke estimates stayed imprecise for both contrasts.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-title">Sensitivity &amp; robustness</h3>
+    <div class="two-col align-start">
+      <div>
+        <p>Seven prespecified specifications over the four-year horizon: <strong>ATO (primary)</strong>; ATE with 1st–99th percentile trimming; ATE with 2.5th–97.5th trimming; ATT; ATO with quantile-based support restriction; ATO with stricter common support; and ATO with an alternative ischemic-stroke definition that excludes unspecified ischemic stroke.</p>
+        <p>For RD and RR together, effect direction was stable in <strong>11 of 16</strong> contrast–endpoint combinations (68.8%). Several secondary endpoints crossed the null under alternative specifications. The primary composite <strong>did not</strong>:</p>
+        <div class="range-viz" id="rangeViz"></div>
+        <p class="small">See <a href="#supp-figures">Supplementary Fig. S2</a> and <a href="#supplementary" data-open-supp="S7">Table S7</a>.</p>
+      </div>
+      <div class="hte-card reveal">
+        <h4><i class="fa-solid fa-people-group"></i> Heterogeneity of treatment effect <span class="tag tag-warn">exploratory</span></h4>
+        <p><strong>CAS vs IMM:</strong> no effect modification in any of the 7 subgroups (all interaction P &gt; 0.05).</p>
+        <p><strong>CEA vs IMM:</strong> interaction evidence for:</p>
+        <div class="hte-chips">
+          <span class="hchip">Sex <b>P &lt; 0.001</b></span><span class="hchip">Diabetes <b>P = 0.026</b></span><span class="hchip">Hypertension <b>P &lt; 0.001</b></span><span class="hchip">Smoking <b>P = 0.020</b></span><span class="hchip">Prior ischemic stroke <b>P &lt; 0.001</b></span><span class="hchip off">Age, race: none</span>
+        </div>
+        <div class="hte-compare">
+          <div><span class="hc-v">0.21</span><span class="hc-l">HR with prior ischemic stroke<br>(0.12–0.37)</span></div>
+          <div><span class="hc-v">0.75</span><span class="hc-l">HR without<br>(0.68–0.81)</span></div>
+        </div>
+        <p class="small muted">Not adjusted for multiple comparisons, so these are hypothesis-generating. Full results are in <a href="#supplementary" data-open-supp="S8">Table S8</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CONCORDANCE ═══════════════ -->
+<section class="section alt" id="concordance">
+  <div class="container">
+    <h2 class="section-title">Directional Agreement with the CREST-2 Trial</h2>
+    <p class="lead">Crude outcomes from the emulated EHR cohorts were compared descriptively with the published CREST-2 randomized outcomes. This is <em>external benchmarking of direction</em>, not numerical replication or causal validation. Causal interpretation rests on the ATO-weighted analyses.</p>
+
+    <div class="concord-wrap">
+      <div class="ring reveal" aria-label="5 of 6 comparisons concordant">
+        <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" class="ring-bg"/><circle cx="60" cy="60" r="50" class="ring-fg" style="--p:0.833"/></svg>
+        <div class="ring-txt"><span>5/6</span><small>concordant</small></div>
+      </div>
+      <div class="table-wrap grow">
+        <table class="data-table concord">
+          <thead><tr><th>Contrast</th><th>Outcome / window</th><th>CREST-2</th><th>Crude EHR</th><th>Direction<sup>Ψ</sup></th></tr></thead>
+          <tbody>
+            <tr><td rowspan="3"><strong>CAS vs IMM</strong></td><td>Stroke/death, 0–44 d</td><td>CAS 1.3% vs IMM 0.0%</td><td>CAS 3.19% vs IMM 3.17%</td><td><span class="badge ok">Concordant</span></td></tr>
+            <tr><td>Late ischemic stroke, 45–1460 d<sup>*</sup></td><td>CAS 0.40 vs IMM 1.70 /100 PY</td><td>CAS 1.61 vs IMM 1.68 /100 PY</td><td><span class="badge ok">Concordant</span></td></tr>
+            <tr><td>4-y primary outcome<sup>†</sup></td><td>CAS 2.8% vs IMM 6.0%</td><td>CAS 5.11% vs IMM 7.12%</td><td><span class="badge ok">Concordant</span></td></tr>
+            <tr><td rowspan="3"><strong>CEA vs IMM</strong></td><td>Stroke/death, 0–44 d</td><td>CEA 1.5% vs IMM 0.5%</td><td>CEA 2.30% vs IMM 3.25%</td><td><span class="badge no">Discordant</span></td></tr>
+            <tr><td>Late ischemic stroke, 45–1460 d<sup>*</sup></td><td>CEA 0.50 vs IMM 1.30 /100 PY</td><td>CEA 1.29 vs IMM 1.69 /100 PY</td><td><span class="badge ok">Concordant</span></td></tr>
+            <tr><td>4-y primary outcome<sup>†</sup></td><td>CEA 3.7% vs IMM 5.3%</td><td>CEA 3.38% vs IMM 7.35%</td><td><span class="badge ok">Concordant</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="footnotes">
+      <p><sup>*</sup> Annualized events per 100 person-years. CREST-2 evaluated adjudicated ipsilateral ischemic stroke. The EHR benchmark used any ischemic stroke, because structured data could not establish laterality relative to the target carotid artery.</p>
+      <p><sup>†</sup> CREST-2's primary outcome was stroke or death through day 44, then ipsilateral ischemic stroke through four years. The EHR analysis used the prespecified computable proxy.</p>
+      <p><sup>Ψ</sup> Concordant means the crude EHR revascularization-vs-IMM contrast had the same direction as the CREST-2 contrast; it says nothing about magnitude or significance. Full detail is in <a href="#supplementary" data-open-supp="S9">Supplementary Table S9</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SUPPLEMENTARY ═══════════════ -->
+<section class="section" id="supplementary">
+  <div class="container">
+    <h2 class="section-title">Supplementary Material</h2>
+    <p class="lead">Every supplementary table can be browsed, searched, and sorted below, and downloaded in its original format.</p>
+
+    <h3 class="sub-title" id="supp-figures">Supplementary Figures</h3>
+    <div class="two-col align-start">
+      <figure class="fig reveal">
+        <img class="zoomable" src="static/images/figS1_covariate_balance.jpg" alt="Supplementary Figure S1: covariate balance plots before and after weighting" loading="lazy">
+        <figcaption><strong>Fig. S1.</strong> Covariate balance (absolute SMD) before and after weighting for both emulations. <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to zoom</span></figcaption>
+      </figure>
+      <figure class="fig reveal">
+        <img class="zoomable" src="static/images/figS2_sensitivity.jpg" alt="Supplementary Figure S2: sensitivity analyses of four-year estimates across seven specifications" loading="lazy">
+        <figcaption><strong>Fig. S2.</strong> Four-year treatment-effect estimates across the seven prespecified sensitivity specifications. <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to zoom</span></figcaption>
+      </figure>
+    </div>
+
+    <h3 class="sub-title">Supplementary Tables</h3>
+    <div class="supp-browser" id="suppBrowser">
+      <div class="supp-tabs" id="suppTabs" role="tablist"></div>
+      <div class="supp-panel">
+        <div class="supp-head">
+          <div>
+            <div class="supp-id" id="suppId"></div>
+            <h4 class="supp-title" id="suppTitle"></h4>
+          </div>
+          <div class="supp-actions">
+            <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="suppSearch" type="search" placeholder="Filter rows…" aria-label="Filter rows"></div>
+            <a class="btn btn-sm" id="suppDownload" href="#" download><i class="fa-solid fa-download"></i> .docx</a>
+          </div>
+        </div>
+        <div class="seg small" id="suppPanels"></div>
+        <div class="table-wrap supp-scroll"><table class="data-table supp-table" id="suppTable"></table></div>
+        <div class="supp-meta"><span id="suppCount"></span><span class="hint" id="suppSortHint"><i class="fa-solid fa-arrow-down-wide-short"></i> Click a column header to sort</span></div>
+        <div class="supp-notes" id="suppNotes"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DISCUSSION ═══════════════ -->
+<section class="section alt" id="discussion">
+  <div class="container">
+    <h2 class="section-title">Main Contributions</h2>
+    <div class="contrib-grid">
+      <div class="contrib reveal"><span class="cn">1</span><p><strong>A hierarchical framework</strong> that translates trial knowledge into PKOs, normalized clinical concepts, and standardized codes, the representational bridge that downstream computability depends on.</p></div>
+      <div class="contrib reveal"><span class="cn">2</span><p><strong>An auditable benchmark</strong> of heterogeneous open-weight LLMs under Full Context and RAG, scored separately at the PKO, concept, and code layers.</p></div>
+      <div class="contrib reveal"><span class="cn">3</span><p><strong>A separation between LLM generation and executable clinical logic</strong>, through a frozen, clinically adjudicated reference standard, constrained code resolution, and human-reviewable intermediate representations.</p></div>
+      <div class="contrib reveal"><span class="cn">4</span><p><strong>Downstream utility, demonstrated</strong> by running the adjudicated CREST-2 specification as explicit target trial emulations in longitudinal EHR data.</p></div>
+      <div class="contrib reveal"><span class="cn">5</span><p><strong>Diagnostics-first causal evaluation</strong>: overlap and balance diagnostics, complementary estimators, sensitivity analyses, and HTE, rather than a single effect estimate.</p></div>
+    </div>
+
+    <div class="two-col align-start lim-row">
+      <div class="lim-card">
+        <h3 class="sub-title"><i class="fa-solid fa-triangle-exclamation"></i> Limitations</h3>
+        <ul>
+          <li><strong>Single trial use case.</strong> Generalizability needs evaluation across more trials and clinical domains.</li>
+          <li><strong>EHR fidelity.</strong> Structured data cannot reproduce every CREST-2 element, especially detailed imaging and carotid laterality, so some definitions and outcomes rely on computable proxies.</li>
+          <li><strong>Residual confounding.</strong> Despite strong measured-covariate balance, unmeasured confounding remains possible. The ATO estimates apply to the empirical overlap population.</li>
+        </ul>
+      </div>
+      <div class="lim-card future">
+        <h3 class="sub-title"><i class="fa-solid fa-route"></i> Looking ahead</h3>
+        <ul>
+          <li>Extend across multiple trials, diseases, institutions, and EHR data models, and quantify how errors propagate from PKO to concept, code, cohort, and estimate.</li>
+          <li>Use uncertainty-aware review to focus clinician attention on ambiguous or high-consequence outputs.</li>
+          <li>Use agentic AI to coordinate retrieval, specification, computability assessment, and human review, linked to patient-level digital twins for adaptive trial design.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CITATION ═══════════════ -->
+<section class="section" id="citation">
+  <div class="container narrow">
+    <h2 class="section-title">BibTeX Citation</h2>
+    <p class="small muted">The citation will be updated with the final author list and venue after publication.</p>
+    <div class="bibtex">
+      <button class="copy-btn" id="copyBib"><i class="fa-regular fa-copy"></i> Copy</button>
+<pre id="bibtex"><code>@article{protocol2tte2026,
+  title   = {Protocol2TTE: From Clinical Trial Knowledge to Real-World Causal
+             Evidence Using Large Language Models and Target Trial Emulation},
+  author  = {Anonymous Authors},
+  journal = {Under review},
+  year    = {2026}
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <p class="foot-title">Protocol2TTE: From Clinical Trial Knowledge to Real-World Causal Evidence Using Large Language Models and Target Trial Emulation</p>
+    <p>All patient data were de-identified. Analyses were exempt from IRB oversight as secondary analyses of anonymized data. This page reports research findings and is not clinical guidance.</p>
+    <p class="muted">Page layout adapted from academic project-page templates (Nerfies / DSANet / Bangla MedConv). Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a>.</p>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+<div class="modal" id="imgModal" aria-hidden="true">
+  <button class="modal-close" aria-label="Close preview"><i class="fa-solid fa-xmark"></i></button>
+  <img id="modalImg" alt="Expanded figure preview">
+  <p class="modal-cap" id="modalCap"></p>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="static/data/supplementary_tables.js"></script>
+<script src="static/js/main.js"></script>
+</body>
+</html>
